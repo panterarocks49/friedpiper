@@ -19,6 +19,4 @@ out
 /resources/public/css/normalize.css
 *.css
 /resources/public/js/.DS_Store
-/node_modules
-node_modules/
-package-lock.json
+/node_modules/
