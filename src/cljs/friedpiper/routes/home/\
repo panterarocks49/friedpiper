@@ -1,8 +1,0 @@
-(ns friedpiper.routes.home.page)
-
-
-(defn main [app-state]
-  [:div "home"])
-
-
-
