@@ -4,26 +4,32 @@
    [goog.object :as obj]))
 
 
-(defn main2 [*app-state]
-  (let [ipfs  (get @*app-state :ipfs)
-        files (obj/get ipfs "files")
-        got   (.get files "QmSPZJdYwoGTfVXWupwkbjYNXRZqT4tBLEbHBYXJAzNA2u" (fn [err files]
-                                                                             (js/console.log "inside get")
-                                                                             (js/console.log files)
-                                                                             (js/console.log err)))
-        ;; got-content (obj/get got "content")
-        ;; got-string (.toString got-content "utf8")
-        ]
-    (js/console.log ipfs)
-    (js/console.log files)
-    (js/console.log got)
-    ;; (js/console.log got-content)
-    ;; (js/console.log got-string)
-    [:div "adsf"]))
+(defn uid []
+  (str "uuid" (.-uuid (random-uuid))))
 
+
+(defn dispatch [*app-state data]
+  (let [orbitdb (get @*app-state :orbitdb)]
+    (println data)
+    (.put orbitdb (clj->js data))))
+
+
+(defn page [*app-state]
+  (r/with-let [*conn (r/cursor *app-state [:conn])
+               *var (r/atom 1)]
+    [:div
+     [:div (pr-str @*conn)]
+     [:button
+      {:on-click #(do
+                    (dispatch *app-state {})
+                    (swap! *var + 1))}
+      "change data"]]))
 
 
 (defn main [*app-state]
-  (r/with-let [*ipfs (r/cursor *app-state [:ipfs])]
-    (if @*ipfs
-      [main2 *app-state])))
+  (let [conn    (get @*app-state :conn)
+        orbitdb (get @*app-state :orbitdb)]
+    (if (and conn orbitdb)
+      [page *app-state]
+      [:div "loading"])))
+

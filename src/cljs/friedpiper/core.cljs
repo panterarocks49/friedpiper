@@ -8,7 +8,7 @@
 
 
 (defmulti current-page (fn [app-state] (:page @app-state)))
-(defmethod current-page :home [app-state] (fn [app-state] [:div "hello"]))
+(defmethod current-page :home [app-state] (fn [app-state] home/main))
 (defmethod current-page :default [app-state] (fn [_]))
 
 

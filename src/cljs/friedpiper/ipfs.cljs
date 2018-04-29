@@ -2,6 +2,9 @@
   (:require
    ;; ["orbit-db" :as orbitDB]
    [promesa.core :as p]
+   [datascript.core :as d]
+   [posh.reagent :as posh]
+   [goog.object :as obj]
    [reagent.core :as r])
   (:require-macros
    [promesa.async-cljs :refer [async]]))
@@ -20,28 +23,50 @@
               ]}}}))
 
 
-(defn init [app-state]
-  (let [*ipfs     (r/cursor app-state [:ipfs])
-        *orbit-db (r/cursor app-state [:orbit-db])
-        new-ipfs  (new js/Ipfs ipfs-options)]
+(def orbit-db-options
+  (clj->js {:create true
+            :overwrite true
+            :localOnly false
+            :type "docstore"
+            :indexBy "db/id"
+            :write ["*"]}))
+
+
+(def schema {})
+
+
+(defn reset-conn! [*conn db-orbit type]
+  (fn []
+    (let [js-info    (.query db-orbit (fn [doc] true))
+          info       (js->clj js-info :keywordize-keys true)]
+      (println info)
+      (if (and info true)
+        (reset! *conn info)))))
+
+
+(defn ipfs-ready [*db *conn new-ipfs]
+  (fn []
+    (p/alet
+     [orbit-db  (js/OrbitDB. new-ipfs)
+      ;; db (p/await (.docs orbit-db "fried/piperr" (clj->js {:write ["*"]})))
+      ;; _ (println (str (obj/get db "address")))
+      db        (p/await (.open orbit-db "/orbitdb/QmZZuzqzbuuVQtCzVEMRJUXfLaPM2yvcFuNmSo2hzXwkdh/fried/piperr" orbit-db-options))
+      _         (p/await (.load db))
+      db-events (obj/get db "events")]
+     ((reset-conn! *conn db "init"))
+     (reset! *db db)
+     (.on db-events "load" (reset-conn! *conn db "load"))
+     (.on db-events "ready" (reset-conn! *conn db "ready"))
+     (.on db-events "replicated" (reset-conn! *conn db "repli"))
+     (.on db-events "write" (reset-conn! *conn db "write"))
+     (.on db-events "replicate.progress" (reset-conn! *conn db "repli.progress"))
+     )
+    true))
+
+
+(defn init [*app-state]
+  (let [*db      (r/cursor *app-state [:orbitdb])
+        *conn    (r/cursor *app-state [:conn])
+        new-ipfs (new js/Ipfs ipfs-options)]
     (.on new-ipfs "error" (fn [e] (js/console.log e)))
-    (.on new-ipfs "ready"
-         (fn []
-           (p/alet
-            [orbit-db (new js/OrbitDB new-ipfs)
-             ;; access   (clj->js
-             ;; {:write ["*"]})
-             db       (p/await (.docs orbit-db "first-db"))
-             hash     (p/await (.put db (clj->js {:_id "friedpiperdata" :value [{:db/id 1} {:db/id 2} {:db/id 3}]})))
-             js-info  (.get db "friedpiperdata")
-             info     (js->clj js-info :keywordize-keys true)
-             ]
-            ;; (reset! *ipfs new-ipfs)
-            ;; (reset! *orbit-db orbit-db)
-            (js/console.log orbit-db)
-            (js/console.log db)
-            (js/console.log hash)
-            (println info)
-            )
-           true)))
-  )
+    (.on new-ipfs "ready" (ipfs-ready *db *conn new-ipfs))))
