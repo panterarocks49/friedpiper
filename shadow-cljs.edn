@@ -1,0 +1,32 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/cljs" "src/clj" "src/js"]
+
+ :dependencies
+ [[org.clojure/clojure "1.8.0"]
+  [org.clojure/clojurescript "1.10.238"]
+  [reagent "0.8.0"]
+  [thheller/shadow-cljsjs "0.0.11"]
+  [kibu/pushy "0.3.8"]
+  [bidi "2.1.2"]
+  [funcool/promesa "1.9.0"]
+  ]
+
+
+ :builds
+ {:dev {:target :browser
+        :output-dir "resources/public/js/compiled"
+        :asset-path "/js/compiled"
+
+        :modules
+        {:main
+         {:entries [friedpiper.core]}}
+
+        :devtools
+        {:autoload true
+         ;; :before-load friedpiper.core/before-load
+         :after-load friedpiper.core/after-load
+         :http-handler shadow.http.push-state/handle
+         :http-root "resources/public"
+         :http-port 8020}}}}
+
