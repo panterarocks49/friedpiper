@@ -6,12 +6,11 @@
  [[org.clojure/clojure "1.8.0"]
   [org.clojure/clojurescript "1.10.238"]
   [reagent "0.8.0"]
-  [datascript "0.16.4"]
-  [posh "0.5.5"]
   [thheller/shadow-cljsjs "0.0.11"]
   [kibu/pushy "0.3.8"]
   [bidi "2.1.2"]
   [funcool/promesa "1.9.0"]
+  [re-com "2.2.0-SNAPSHOT"]
   ]
 
 
@@ -23,6 +22,8 @@
         :modules
         {:main
          {:entries [friedpiper.core]}}
+
+        :release {:compiler-options {:optimizations :none}}
 
         :devtools
         {:autoload true

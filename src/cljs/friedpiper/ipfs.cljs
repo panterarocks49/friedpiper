@@ -1,9 +1,6 @@
 (ns friedpiper.ipfs
   (:require
-   ;; ["orbit-db" :as orbitDB]
    [promesa.core :as p]
-   [datascript.core :as d]
-   [posh.reagent :as posh]
    [goog.object :as obj]
    [reagent.core :as r])
   (:require-macros
@@ -28,7 +25,7 @@
             :overwrite true
             :localOnly false
             :type "docstore"
-            :indexBy "db/id"
+            :indexBy "hash"
             :write ["*"]}))
 
 
@@ -48,9 +45,9 @@
   (fn []
     (p/alet
      [orbit-db  (js/OrbitDB. new-ipfs)
-      ;; db (p/await (.docs orbit-db "fried/piperr" (clj->js {:write ["*"]})))
+      ;; db (p/await (.docs orbit-db "friedpiperr" (clj->js {:write ["*"] :indexBy "hash"})))
       ;; _ (println (str (obj/get db "address")))
-      db        (p/await (.open orbit-db "/orbitdb/QmZZuzqzbuuVQtCzVEMRJUXfLaPM2yvcFuNmSo2hzXwkdh/fried/piperr" orbit-db-options))
+      db        (p/await (.open orbit-db "/orbitdb/Qme1kbqB8eoRNWha3NqoqMwcFc8AJBd3yfm9EWPiEqJRUj/friedpiperr" orbit-db-options))
       _         (p/await (.load db))
       db-events (obj/get db "events")]
      ((reset-conn! *conn db "init"))
