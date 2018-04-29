@@ -10,13 +10,20 @@
 (defn search-hashes [*app-state]
   (let [conn     (get @*app-state :conn)
         children (for [ent conn]
-                   [:div
-                    [:h4
-                     {:style {:padding "2px"}}
-                     (get ent :title)]
-                    [:div
-                     {:style {:padding "2px"}}
-                     (get ent :hash)]])]
+                   (let [title (get ent :title)
+                         hash  (get ent :hash)]
+                     [:div
+                      {:style {:padding-top "10px"}}
+                      [:h4.level4
+                       title]
+                      [rc/h-box
+                       :justify :between
+                       :children
+                       [#_[:button.pt-button.pt-icon-duplicate
+                           {:style {:margin-right "5px"}}]
+                        [:a
+                         {:href (str "https://gateway.ipfs.io/ipfs/" hash "/")}
+                         hash]]]]))]
     [rc/v-box
      :align :start
      :children children]))
