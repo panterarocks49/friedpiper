@@ -14,7 +14,7 @@
                          hash  (get ent :hash)]
                      [:div
                       {:style {:padding-top "10px"}}
-                      [:h4.level4
+                      [:h4
                        title]
                       [rc/h-box
                        :justify :between
