@@ -8,8 +8,18 @@
 
 
 (defn search-hashes [*app-state]
-  (r/with-let [*conn (r/cursor *app-state [:conn])]
-    [:div (pr-str @*conn)]))
+  (let [conn     (get @*app-state :conn)
+        children (for [ent conn]
+                   [:div
+                    [:h4
+                     {:style {:padding "2px"}}
+                     (get ent :title)]
+                    [:div
+                     {:style {:padding "2px"}}
+                     (get ent :hash)]])]
+    [rc/v-box
+     :align :start
+     :children children]))
 
 
 
